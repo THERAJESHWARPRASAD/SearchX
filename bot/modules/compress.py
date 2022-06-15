@@ -75,7 +75,7 @@ class CompressListener:
                 if os.path.isdir(m_path):
                     for dirpath, subdir, files in os.walk(m_path, topdown=False):
                         for file_ in files:
-                            if file_.endswith(".zip") or re.search(r'\.part0*1\.rar$|\.7z\.0*1$|\.zip\.0*1$', file_) \
+                            if file_.endswith((".zip", ".7z")) or re.search(r'\.part0*1\.rar$|\.7z\.0*1$|\.zip\.0*1$', file_) \
                                or (file_.endswith(".rar") and not re.search(r'\.part\d+\.rar$', file_)):
                                 m_path = os.path.join(dirpath, file_)
                                 if self.pswd is not None:
@@ -85,7 +85,7 @@ class CompressListener:
                                 if result.returncode != 0:
                                     LOGGER.error("Failed to extract the archive")
                         for file_ in files:
-                            if file_.endswith((".rar", ".zip")) or re.search(r'\.r\d+$|\.7z\.\d+$|\.z\d+$|\.zip\.\d+$', file_):
+                            if file_.endswith((".rar", ".zip", ".7z")) or re.search(r'\.r\d+$|\.7z\.\d+$|\.z\d+$|\.zip\.\d+$', file_):
                                 del_path = os.path.join(dirpath, file_)
                                 os.remove(del_path)
                     path = f'{DOWNLOAD_DIR}{self.uid}/{name}'
@@ -99,8 +99,8 @@ class CompressListener:
                     else:
                         LOGGER.error("Failed to extract the archive")
                         path = f'{DOWNLOAD_DIR}{self.uid}/{name}'
-            except CompressExceptionHandler:
-                LOGGER.info("Not a valid archive")
+            except CompressExceptionHandler as err:
+                LOGGER.info(err)
                 path = f'{DOWNLOAD_DIR}{self.uid}/{name}'
         else:
             path = f'{DOWNLOAD_DIR}{self.uid}/{name}'
@@ -216,7 +216,7 @@ def _compress(bot, message, is_archive=False, is_extract=False, pswd=None):
         threading.Thread(target=add_gd_download, args=(link, listener, is_appdrive, appdict, is_gdtot)).start()
     else:
         help_msg = '<b><u>Instructions</u></b>\nSend a link along with command'
-        help_msg += '\n\n<b><u>Supported Sites</u></b>\n• Google Drive\n• AppDrive\n• DriveApp\n• GDToT'
+        help_msg += '\n\n<b><u>Supported Sites</u></b>\n• Google Drive\n• AppDrive\n• GDToT'
         help_msg += '\n\n<b><u>Set Password</u></b>\nAdd "<code>pswd: xxx</code>" after the link'
         sendMessage(help_msg, bot, message)
 
